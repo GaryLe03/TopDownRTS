@@ -14,7 +14,7 @@ height = 2.0
 albedo_color = Color(0, 1, 0, 1)
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_1"]
-material = Sub_resource("StandardMaterial3D_1")
+material = SubResource("StandardMaterial3D_1")
 top_radius = 0.6
 bottom_radius = 0.6
 height = 0.1
@@ -24,15 +24,15 @@ script = ExtResource("1_unit")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-mesh = Sub_resource("CapsuleMesh_1")
+mesh = SubResource("CapsuleMesh_1")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-shape = Sub_resource("CapsuleShape3D_1")
+shape = SubResource("CapsuleShape3D_1")
 
 [node name="SelectionVisual" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
 visible = false
-mesh = Sub_resource("CylinderMesh_1")
+mesh = SubResource("CylinderMesh_1")
 
 [node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]

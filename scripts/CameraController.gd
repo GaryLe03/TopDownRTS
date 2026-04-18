@@ -74,7 +74,7 @@ func _move_selected_units(mouse_pos):
 	var query = PhysicsRayQueryParameters3D.create(from, to)
 	var result = space_state.intersect_ray(query)
 
-	if result:
+	if not result.is_empty():
 		var target_pos = result.position
 		var selected_units = []
 		for unit in get_tree().get_nodes_in_group("units"):
