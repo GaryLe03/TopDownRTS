@@ -87,8 +87,9 @@ func _move_selected_units(mouse_pos):
 		if count == 0: return
 
 		var side = ceil(sqrt(count))
+		var offset_start = (side - 1) * 1.5 / 2.0
 		for i in range(count):
 			var x = i % int(side)
 			var z = i / int(side)
-			var offset = Vector3(x * 1.5, 0, z * 1.5)
+			var offset = Vector3(x * 1.5 - offset_start, 0, z * 1.5 - offset_start)
 			selected_units[i].move_to(target_pos + offset)

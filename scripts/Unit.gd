@@ -13,7 +13,8 @@ var target_position = Vector3.ZERO
 
 func _ready():
 	selection_visual.visible = is_selected
-	target_position = global_position
+	# Initialize target position
+	nav_agent.target_position = global_position
 
 func _physics_process(delta):
 	# Force unit to stay on the ground plane
