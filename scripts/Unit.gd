@@ -41,4 +41,15 @@ func _physics_process(delta):
 func move_to(target_pos: Vector3):
 	var main = get_tree().root.find_child("Main", true, false)
 	if main and main.has_method("get_astar_path"):
-		path = main.get_astar_path(global_position, target_pos)
+		var new_path = main.get_astar_path(global_position, target_pos)
+
+		# Prevent 'snap-back' to the center of the current grid cell
+		# If the first point in the path is very close to current position, skip it
+		if new_path.size() > 1:
+			var first_point = new_path[0]
+			var dist_to_first = (first_point - global_position)
+			dist_to_first.y = 0
+			if dist_to_first.length() < 0.8: # Cell size is 1.0, so 0.8 is safe
+				new_path.remove_at(0)
+
+		path = new_path
