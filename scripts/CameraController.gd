@@ -69,13 +69,14 @@ func _select_units_in_box(start, end):
 
 func _move_selected_units(mouse_pos):
 	var from = project_ray_origin(mouse_pos)
-	var to = from + project_ray_normal(mouse_pos) * 1000
-	var space_state = get_world_3d().direct_space_state
-	var query = PhysicsRayQueryParameters3D.create(from, to)
-	var result = space_state.intersect_ray(query)
+	var dir = project_ray_normal(mouse_pos)
 
-	if not result.is_empty():
-		var target_pos = result.position
+	# Project onto ground plane (y=0)
+	var ground_plane = Plane(Vector3.UP, 0)
+	var intersection = ground_plane.intersects_ray(from, dir)
+
+	if intersection != null:
+		var target_pos = intersection
 		var selected_units = []
 		for unit in get_tree().get_nodes_in_group("units"):
 			if unit.is_selected:

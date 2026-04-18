@@ -16,9 +16,14 @@ func _ready():
 	target_position = global_position
 
 func _physics_process(delta):
-	if global_position.distance_to(target_position) > 0.1:
-		var direction = (target_position - global_position).normalized()
-		velocity = direction * 5.0
+	var pos_2d = Vector2(global_position.x, global_position.z)
+	var target_2d = Vector2(target_position.x, target_position.z)
+
+	if pos_2d.distance_to(target_2d) > 0.1:
+		var direction_2d = (target_2d - pos_2d).normalized()
+		velocity.x = direction_2d.x * 5.0
+		velocity.z = direction_2d.y * 5.0
+		velocity.y = 0 # Ensure we stay on ground
 		move_and_slide()
 	else:
 		velocity = Vector3.ZERO
