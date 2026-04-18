@@ -16,17 +16,16 @@ func _ready():
 	target_position = global_position
 
 func _physics_process(delta):
-	var pos_2d = Vector2(global_position.x, global_position.z)
-	var target_2d = Vector2(target_position.x, target_position.z)
-
-	if pos_2d.distance_to(target_2d) > 0.1:
-		var direction_2d = (target_2d - pos_2d).normalized()
-		velocity.x = direction_2d.x * 5.0
-		velocity.z = direction_2d.y * 5.0
-		velocity.y = 0 # Ensure we stay on ground
-		move_and_slide()
-	else:
+	if nav_agent.is_navigation_finished():
 		velocity = Vector3.ZERO
+		return
+
+	var next_path_position: Vector3 = nav_agent.get_next_path_position()
+	var current_agent_position: Vector3 = global_position
+	var new_velocity: Vector3 = (next_path_position - current_agent_position).normalized() * 5.0
+
+	velocity = new_velocity
+	move_and_slide()
 
 func move_to(pos: Vector3):
-	target_position = pos
+	nav_agent.set_target_position(pos)
