@@ -35,4 +35,7 @@ func _physics_process(delta):
 	move_and_slide()
 
 func move_to(pos: Vector3):
-	nav_agent.set_target_position(pos)
+	# Ensure the target is at ground level
+	var ground_pos = pos
+	ground_pos.y = 0
+	nav_agent.target_position = ground_pos
