@@ -16,27 +16,22 @@ func _ready():
 	target_position = global_position
 
 func _physics_process(delta):
-	if not is_on_floor():
-		velocity.y -= 9.8 * delta
-	else:
-		velocity.y = 0
+	# Force unit to stay on the ground plane
+	global_position.y = 0
 
 	if nav_agent.is_navigation_finished():
-		velocity.x = 0
-		velocity.z = 0
-		move_and_slide()
+		velocity = Vector3.ZERO
 		return
 
 	var next_path_position: Vector3 = nav_agent.get_next_path_position()
 	var current_agent_position: Vector3 = global_position
 
-	# Calculate 2D direction (XZ plane)
-	var dir_3d = (next_path_position - current_agent_position)
-	var dir_2d = Vector2(dir_3d.x, dir_3d.z).normalized()
+	# Move towards the next path point, ignoring vertical difference
+	var direction = (next_path_position - current_agent_position)
+	direction.y = 0
+	direction = direction.normalized()
 
-	velocity.x = dir_2d.x * 5.0
-	velocity.z = dir_2d.y * 5.0
-
+	velocity = direction * 5.0
 	move_and_slide()
 
 func move_to(pos: Vector3):
