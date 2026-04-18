@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/CameraController.gd" id="1_cam"]
 [ext_resource type="PackedScene" path="res://scenes/Unit.tscn" id="2_unit"]
@@ -24,11 +24,6 @@ size = Vector2(100, 100)
 [sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_1"]
 data = PackedVector3Array(50, 0, 50, -50, 0, 50, 50, 0, -50, -50, 0, 50, -50, 0, -50, 50, 0, -50)
 
-[sub_resource type="NavigationMesh" id="NavigationMesh_1"]
-agent_height = 2.0
-agent_max_climb = 0.1
-agent_max_slope = 1.0
-
 [node name="Main" type="Node3D"]
 script = ExtResource("4_main")
 
@@ -39,10 +34,7 @@ environment = SubResource("Environment_1")
 transform = Transform3D(-0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, 0.75, -0.433013, 0, 0, 0)
 shadow_enabled = true
 
-[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]
-navigation_mesh = SubResource("NavigationMesh_1")
-
-[node name="Ground" type="StaticBody3D" parent="NavigationRegion3D"]
+[node name="Ground" type="StaticBody3D" parent="."]
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Ground"]
 mesh = SubResource("PlaneMesh_1")
@@ -50,18 +42,18 @@ mesh = SubResource("PlaneMesh_1")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
 shape = SubResource("ConcavePolygonShape3D_1")
 
-[node name="Obstacles" type="Node3D" parent="NavigationRegion3D"]
+[node name="Obstacles" type="Node3D" parent="."]
 
-[node name="Obstacle" parent="NavigationRegion3D/Obstacles" instance=ExtResource("3_obs")]
+[node name="Obstacle" parent="Obstacles" instance=ExtResource("3_obs")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 5)
 
-[node name="Obstacle2" parent="NavigationRegion3D/Obstacles" instance=ExtResource("3_obs")]
+[node name="Obstacle2" parent="Obstacles" instance=ExtResource("3_obs")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 5)
 
-[node name="Obstacle3" parent="NavigationRegion3D/Obstacles" instance=ExtResource("3_obs")]
+[node name="Obstacle3" parent="Obstacles" instance=ExtResource("3_obs")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -8)
 
-[node name="Obstacle4" parent="NavigationRegion3D/Obstacles" instance=ExtResource("3_obs")]
+[node name="Obstacle4" parent="Obstacles" instance=ExtResource("3_obs")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -5)
 
 [node name="CameraController" type="Camera3D" parent="."]
