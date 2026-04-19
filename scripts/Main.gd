@@ -1,8 +1,8 @@
 extends Node3D
 
 var astar = AStarGrid2D.new()
-var grid_size = Vector2i(100, 100)
-var cell_size = 1.0
+var grid_size = Vector2i(200, 200)
+var cell_size = 0.5
 var offset = Vector2(-50, -50)
 
 func _ready():
@@ -22,9 +22,11 @@ func setup_grid():
 	for obstacle in get_tree().get_nodes_in_group("obstacles"):
 		var pos = obstacle.global_position
 		var grid_pos = world_to_grid(pos)
-		# Obstacles are 2x2x2, so we mark a small area
-		for x in range(-1, 2):
-			for y in range(-1, 2):
+		# Obstacles are 2x2x2. Cell size is 0.5, so 4x4 cells.
+		# Add padding for unit radius (0.5 = 1 cell).
+		# Mark 3x3 cells from center to be safe (radius 1.5).
+		for x in range(-3, 4):
+			for y in range(-3, 4):
 				var p = grid_pos + Vector2i(x, y)
 				if astar.region.has_point(p):
 					astar.set_point_solid(p)

@@ -10,6 +10,8 @@ var is_selected = false:
 
 var path: Array[Vector3] = []
 var speed = 5.0
+var stuck_timer = 0.0
+var last_pos = Vector3.ZERO
 
 func _ready():
 	selection_visual.visible = is_selected
@@ -20,14 +22,23 @@ func _physics_process(delta):
 
 	if path.is_empty():
 		velocity = Vector3.ZERO
+		stuck_timer = 0.0
 		return
 
 	var target = path[0]
 	var dir = (target - global_position)
 	dir.y = 0
 
-	if dir.length() < 0.2:
+	# Stuck detection
+	if global_position.distance_to(last_pos) < 0.01:
+		stuck_timer += delta
+	else:
+		stuck_timer = 0.0
+	last_pos = global_position
+
+	if dir.length() < 0.3 or stuck_timer > 0.5:
 		path.remove_at(0)
+		stuck_timer = 0.0
 		if path.is_empty():
 			velocity = Vector3.ZERO
 			return
@@ -49,7 +60,7 @@ func move_to(target_pos: Vector3):
 			var first_point = new_path[0]
 			var dist_to_first = (first_point - global_position)
 			dist_to_first.y = 0
-			if dist_to_first.length() < 0.8: # Cell size is 1.0, so 0.8 is safe
+			if dist_to_first.length() < 0.4: # Cell size is 0.5, so 0.4 is safe
 				new_path.remove_at(0)
 
 		path = new_path
