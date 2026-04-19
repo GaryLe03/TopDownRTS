@@ -50,7 +50,7 @@ func _physics_process(delta):
 	move_and_slide()
 
 func move_to(target_pos: Vector3):
-	var main = get_tree().root.find_child("Main", true, false)
+	var main = get_tree().current_scene
 	if main and main.has_method("get_astar_path"):
 		var new_path = main.get_astar_path(global_position, target_pos)
 

@@ -6,6 +6,8 @@ var cell_size = 0.5
 var offset = Vector2(-50, -50)
 
 func _ready():
+	# Wait for a frame to ensure all scene nodes are fully ready and placed
+	await get_tree().process_frame
 	setup_grid()
 
 func setup_grid():
@@ -13,23 +15,32 @@ func setup_grid():
 	astar.cell_size = Vector2(cell_size, cell_size)
 	astar.default_compute_heuristic = AStarGrid2D.HEURISTIC_EUCLIDEAN
 	astar.default_estimate_heuristic = AStarGrid2D.HEURISTIC_EUCLIDEAN
-	astar.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_AT_LEAST_ONE_WALKABLE
+	astar.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_ONLY_IF_NO_OBSTACLES
 	astar.update()
 
 	# Mark obstacles as solid
-	# For simplicity, we search for all StaticBody3D in the 'obstacles' group
-	# Make sure obstacles are added to this group or identified appropriately
-	for obstacle in get_tree().get_nodes_in_group("obstacles"):
+	# We check the 'obstacles' group and children of the 'Obstacles' node for redundancy
+	var obstacle_nodes = get_tree().get_nodes_in_group("obstacles")
+	var obstacles_container = find_child("Obstacles", true, false)
+	if obstacles_container:
+		for child in obstacles_container.get_children():
+			if not obstacle_nodes.has(child):
+				obstacle_nodes.append(child)
+
+	for obstacle in obstacle_nodes:
 		var pos = obstacle.global_position
 		var grid_pos = world_to_grid(pos)
+
 		# Obstacles are 2x2x2. Cell size is 0.5, so 4x4 cells.
-		# Add padding for unit radius (0.5 = 1 cell).
-		# Mark 3x3 cells from center to be safe (radius 1.5).
-		for x in range(-3, 4):
-			for y in range(-3, 4):
+		# We mark a slightly larger area to prevent units (radius 0.4) from clipping.
+		# Mark 5x5 cells (radius 1.25 units) to ensure clearance.
+		for x in range(-2, 3):
+			for y in range(-2, 3):
 				var p = grid_pos + Vector2i(x, y)
 				if astar.region.has_point(p):
-					astar.set_point_solid(p)
+					astar.set_point_solid(p, true)
+
+	astar.update()
 
 func world_to_grid(world_pos: Vector3) -> Vector2i:
 	return Vector2i(
