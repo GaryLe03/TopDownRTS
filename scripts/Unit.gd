@@ -116,10 +116,10 @@ func _shoot(target):
 	shooting_visual.scale.z = dist
 	shooting_visual.position = Vector3(0, 1, -dist/2.0)
 	shooting_visual.visible = true
-	await get_tree().create_timer(0.1).timeout
+	await get_tree().create_timer(0.15).timeout
 	shooting_visual.visible = false
 	shooting_visual.position = Vector3.ZERO
-	shooting_visual.scale = Vector3(0.1, 0.1, 1)
+	shooting_visual.scale = Vector3(1, 1, 1)
 
 func take_damage(amount):
 	health -= amount

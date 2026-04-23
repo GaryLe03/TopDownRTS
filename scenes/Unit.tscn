@@ -19,8 +19,13 @@ top_radius = 0.6
 bottom_radius = 0.6
 height = 0.1
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_shoot"]
+shading_mode = 0
+albedo_color = Color(1, 0.8, 0, 1)
+
 [sub_resource type="BoxMesh" id="BoxMesh_shoot"]
-size = Vector3(0.05, 0.05, 1)
+material = SubResource("StandardMaterial3D_shoot")
+size = Vector3(0.1, 0.1, 1)
 
 [node name="Unit" type="CharacterBody3D" groups=["units"]]
 script = ExtResource("1_unit")
