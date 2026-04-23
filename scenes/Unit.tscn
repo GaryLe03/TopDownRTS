@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/Unit.gd" id="1_unit"]
 
@@ -19,6 +19,9 @@ top_radius = 0.6
 bottom_radius = 0.6
 height = 0.1
 
+[sub_resource type="BoxMesh" id="BoxMesh_shoot"]
+size = Vector3(0.05, 0.05, 1)
+
 [node name="Unit" type="CharacterBody3D" groups=["units"]]
 script = ExtResource("1_unit")
 
@@ -34,3 +37,11 @@ shape = SubResource("CapsuleShape3D_1")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
 visible = false
 mesh = SubResource("CylinderMesh_1")
+
+[node name="ShootingVisual" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+visible = false
+mesh = SubResource("BoxMesh_shoot")
+
+[node name="AttackTimer" type="Timer" parent="."]
+one_shot = true

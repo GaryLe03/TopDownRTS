@@ -58,6 +58,10 @@ func _select_units_in_box(start, end):
 
 	var units = get_tree().get_nodes_in_group("units")
 	for unit in units:
+		if unit.team != 0:
+			unit.is_selected = false
+			continue
+
 		var screen_pos = unproject_position(unit.global_position)
 		if is_single_click:
 			# For single click, we might want raycasting instead,

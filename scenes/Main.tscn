@@ -1,9 +1,10 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://scripts/CameraController.gd" id="1_cam"]
 [ext_resource type="PackedScene" path="res://scenes/Unit.tscn" id="2_unit"]
 [ext_resource type="PackedScene" path="res://scenes/Obstacle.tscn" id="3_obs"]
 [ext_resource type="Script" path="res://scripts/Main.gd" id="4_main"]
+[ext_resource type="PackedScene" path="res://scenes/EnemyUnit.tscn" id="5_enemy"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
 sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
@@ -70,6 +71,14 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -2)
 
 [node name="Unit3" parent="Units" instance=ExtResource("2_unit")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
+
+[node name="Enemies" type="Node3D" parent="."]
+
+[node name="EnemyUnit" parent="Enemies" instance=ExtResource("5_enemy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -5)
+
+[node name="EnemyUnit2" parent="Enemies" instance=ExtResource("5_enemy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -5)
 
 [node name="UI" type="CanvasLayer" parent="."]
 
