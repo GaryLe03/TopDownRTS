@@ -26,6 +26,7 @@ func _ready():
 	selection_visual.visible = is_selected
 	global_position.y = 0
 	attack_timer.wait_time = 1.0 / attack_rate
+	shooting_visual.top_level = true
 
 	# Set color based on team
 	var material = StandardMaterial3D.new()
@@ -111,15 +112,18 @@ func _shoot(target):
 	target.take_damage(attack_damage)
 
 	# Visual effect
-	shooting_visual.look_at(target.global_position + Vector3(0, 1, 0))
-	var dist = global_position.distance_to(target.global_position)
-	shooting_visual.scale.z = dist
-	shooting_visual.position = Vector3(0, 1, -dist/2.0)
+	var my_pos = global_position + Vector3(0, 1, 0)
+	var target_pos = target.global_position + Vector3(0, 1, 0)
+	var dist = my_pos.distance_to(target_pos)
+
+	shooting_visual.global_position = (my_pos + target_pos) / 2.0
+	shooting_visual.look_at(target_pos)
+	shooting_visual.scale = Vector3(1, 1, dist)
+
 	shooting_visual.visible = true
 	await get_tree().create_timer(0.15).timeout
-	shooting_visual.visible = false
-	shooting_visual.position = Vector3.ZERO
-	shooting_visual.scale = Vector3(1, 1, 1)
+	if is_instance_valid(shooting_visual):
+		shooting_visual.visible = false
 
 func take_damage(amount):
 	health -= amount
