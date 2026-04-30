@@ -1,7 +1,9 @@
 extends Camera3D
 
-@export var move_speed := 20.0
+@export var move_speed := 40.0
 @export var zoom_speed := 2.0
+@export var min_zoom := 5.0
+@export var max_zoom := 50.0
 
 var selection_start = Vector2.ZERO
 var is_dragging = false
@@ -28,6 +30,14 @@ func _handle_movement(delta):
 
 func _unhandled_input(event):
 	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+			global_position -= global_transform.basis.z * zoom_speed
+		if event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			global_position += global_transform.basis.z * zoom_speed
+
+		# Clamp zoom (distance from y=0)
+		global_position.y = clamp(global_position.y, min_zoom, max_zoom)
+
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			if event.pressed:
 				selection_start = event.position

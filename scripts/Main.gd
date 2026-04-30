@@ -1,9 +1,9 @@
 extends Node3D
 
 var astar = AStarGrid2D.new()
-var grid_size = Vector2i(200, 200)
+var grid_size = Vector2i(800, 800)
 var cell_size = 0.5
-var offset = Vector2(-50, -50)
+var offset = Vector2(-200, -200)
 
 func _ready():
 	# Wait for a frame to ensure all scene nodes are fully ready and placed
