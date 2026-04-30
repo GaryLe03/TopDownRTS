@@ -1,9 +1,9 @@
 extends Camera3D
 
-@export var move_speed := 40.0
-@export var zoom_speed := 2.0
+@export var base_move_speed := 20.0
+@export var zoom_speed := 5.0
 @export var min_zoom := 5.0
-@export var max_zoom := 50.0
+@export var max_zoom := 100.0
 
 var selection_start = Vector2.ZERO
 var is_dragging = false
@@ -25,7 +25,9 @@ func _handle_movement(delta):
 	if Input.is_action_pressed("ui_right") or Input.is_key_pressed(KEY_D):
 		input_dir.x += 1
 
-	var move_vec = input_dir.normalized() * move_speed * delta
+	# Scale move speed based on current height (y)
+	var current_move_speed = base_move_speed * (global_position.y / 10.0)
+	var move_vec = input_dir.normalized() * current_move_speed * delta
 	global_position += move_vec
 
 func _unhandled_input(event):
