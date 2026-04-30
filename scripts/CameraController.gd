@@ -32,13 +32,15 @@ func _handle_movement(delta):
 
 func _unhandled_input(event):
 	if event is InputEventMouseButton:
+		var potential_pos = global_position
 		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
-			global_position -= global_transform.basis.z * zoom_speed
-		if event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-			global_position += global_transform.basis.z * zoom_speed
+			potential_pos -= global_transform.basis.z * zoom_speed
+		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			potential_pos += global_transform.basis.z * zoom_speed
 
-		# Clamp zoom (distance from y=0)
-		global_position.y = clamp(global_position.y, min_zoom, max_zoom)
+		# Only apply zoom if it keeps the camera within Y bounds
+		if potential_pos.y >= min_zoom and potential_pos.y <= max_zoom:
+			global_position = potential_pos
 
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			if event.pressed:
