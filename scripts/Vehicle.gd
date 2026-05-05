@@ -46,7 +46,7 @@ func _physics_process(delta):
 
 func _handle_car_movement(delta):
 	if path.is_empty():
-		current_speed = move_toward(current_speed, 0, friction * delta)
+		current_speed = move_toward(current_speed, 0, friction * delta * 2.0)
 		velocity = -transform.basis.z * current_speed
 		move_and_slide()
 		return
@@ -55,13 +55,18 @@ func _handle_car_movement(delta):
 	var to_target = (target - global_position)
 	to_target.y = 0
 
-	if to_target.length() < 1.0:
+	# Detect if we are approaching the final point
+	var is_final_point = path.size() == 1
+	var stop_dist = 2.0 if is_final_point else 1.0
+
+	if to_target.length() < stop_dist:
 		path.remove_at(0)
 		if path.is_empty():
 			return
 		target = path[0]
 		to_target = (target - global_position)
 		to_target.y = 0
+		is_final_point = path.size() == 1
 
 	# Calculate steering angle
 	var target_dir = to_target.normalized()
@@ -74,6 +79,13 @@ func _handle_car_movement(delta):
 	# Acceleration logic
 	# Slow down for sharp turns
 	var throttle = 1.0 - (abs(steering) * 0.5)
+
+	# Braking logic: Slow down as we approach the final destination
+	if is_final_point:
+		var dist = to_target.length()
+		if dist < 10.0:
+			throttle *= (dist / 10.0)
+
 	current_speed = move_toward(current_speed, max_speed * throttle, acceleration * delta)
 
 	# Rotate the car based on speed and steering
