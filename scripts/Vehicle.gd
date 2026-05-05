@@ -1,6 +1,7 @@
 extends CharacterBody3D
 
 @onready var selection_visual = $SelectionVisual
+@onready var push_area = $PushArea
 
 @export var team = 0 # 0 for player, 1 for enemy
 @export var health = 200.0
@@ -43,6 +44,20 @@ func _physics_process(delta):
 		return
 
 	_handle_car_movement(delta)
+	_handle_soft_push(delta)
+
+func _handle_soft_push(delta):
+	var bodies = push_area.get_overlapping_bodies()
+	for body in bodies:
+		if body != self and body.is_in_group("units"):
+			var push_dir = (body.global_position - global_position)
+			push_dir.y = 0
+			var dist = push_dir.length()
+			if dist < 0.1: continue # Avoid division by zero
+
+			# Stronger push when closer
+			var force = (4.0 - dist) / 4.0
+			body.global_position += push_dir.normalized() * force * 5.0 * delta
 
 func _handle_car_movement(delta):
 	if path.is_empty():
