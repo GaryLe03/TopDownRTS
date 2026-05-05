@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://scripts/CameraController.gd" id="1_cam"]
 [ext_resource type="PackedScene" path="res://scenes/Unit.tscn" id="2_unit"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://scripts/Main.gd" id="4_main"]
 [ext_resource type="PackedScene" path="res://scenes/EnemyUnit.tscn" id="5_enemy"]
 [ext_resource type="PackedScene" path="res://scenes/CapturePoint.tscn" id="6_capt"]
+[ext_resource type="Script" path="res://scripts/EnemyAI.gd" id="7_ai"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
 sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
@@ -28,6 +29,9 @@ data = PackedVector3Array(200, 0, 200, -200, 0, 200, 200, 0, -200, -200, 0, 200,
 
 [node name="Main" type="Node3D"]
 script = ExtResource("4_main")
+
+[node name="EnemyAI" type="Node" parent="."]
+script = ExtResource("7_ai")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_1")
