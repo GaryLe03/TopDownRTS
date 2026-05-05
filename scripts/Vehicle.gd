@@ -1,0 +1,100 @@
+extends CharacterBody3D
+
+@onready var selection_visual = $SelectionVisual
+
+@export var team = 0 # 0 for player, 1 for enemy
+@export var health = 200.0
+@export var capacity = 4
+
+# Car-like movement properties
+@export var max_speed = 10.0
+@export var acceleration = 5.0
+@export var friction = 2.0
+@export var steer_speed = 3.0
+@export var turn_radius = 2.0
+
+var is_selected = false:
+	set(value):
+		is_selected = value
+		if selection_visual:
+			selection_visual.visible = value
+
+var path: Array[Vector3] = []
+var current_speed = 0.0
+var steering = 0.0
+
+func _ready():
+	selection_visual.visible = is_selected
+	global_position.y = 0
+
+	# Set color based on team
+	var material = StandardMaterial3D.new()
+	if team == 0:
+		material.albedo_color = Color(0, 0.5, 1)
+	else:
+		material.albedo_color = Color(1, 0, 0)
+	$MeshInstance3D.material_override = material
+
+func _physics_process(delta):
+	global_position.y = 0
+
+	if health <= 0:
+		queue_free()
+		return
+
+	_handle_car_movement(delta)
+
+func _handle_car_movement(delta):
+	if path.is_empty():
+		current_speed = move_toward(current_speed, 0, friction * delta)
+		velocity = -transform.basis.z * current_speed
+		move_and_slide()
+		return
+
+	var target = path[0]
+	var to_target = (target - global_position)
+	to_target.y = 0
+
+	if to_target.length() < 1.0:
+		path.remove_at(0)
+		if path.is_empty():
+			return
+		target = path[0]
+		to_target = (target - global_position)
+		to_target.y = 0
+
+	# Calculate steering angle
+	var target_dir = to_target.normalized()
+	var forward = -transform.basis.z
+	var angle_to_target = forward.signed_angle_to(target_dir, Vector3.UP)
+
+	# Simple steering logic
+	steering = move_toward(steering, clamp(angle_to_target, -1.0, 1.0), steer_speed * delta)
+
+	# Acceleration logic
+	# Slow down for sharp turns
+	var throttle = 1.0 - (abs(steering) * 0.5)
+	current_speed = move_toward(current_speed, max_speed * throttle, acceleration * delta)
+
+	# Rotate the car based on speed and steering
+	rotate_y(steering * current_speed * delta / turn_radius)
+
+	velocity = -transform.basis.z * current_speed
+	move_and_slide()
+
+func move_to(target_pos: Vector3):
+	var main = get_tree().current_scene
+	if main and main.has_method("get_astar_path"):
+		var new_path = main.get_astar_path(global_position, target_pos)
+
+		if new_path.size() > 1:
+			var first_point = new_path[0]
+			var dist_to_first = (first_point - global_position)
+			dist_to_first.y = 0
+			if dist_to_first.length() < 1.0:
+				new_path.remove_at(0)
+
+		path = new_path
+
+func take_damage(amount):
+	health -= amount
