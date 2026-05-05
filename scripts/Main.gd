@@ -15,7 +15,7 @@ func setup_grid():
 	astar.cell_size = Vector2(cell_size, cell_size)
 	astar.default_compute_heuristic = AStarGrid2D.HEURISTIC_EUCLIDEAN
 	astar.default_estimate_heuristic = AStarGrid2D.HEURISTIC_EUCLIDEAN
-	astar.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_ONLY_IF_NO_OBSTACLES
+	astar.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_AT_LEAST_ONE_WALKABLE
 	astar.update()
 
 	# Mark obstacles as solid
@@ -66,4 +66,42 @@ func get_astar_path(start_world: Vector3, end_world: Vector3) -> Array[Vector3]:
 	var path_world: Array[Vector3] = []
 	for p in path_grid:
 		path_world.append(grid_to_world(p))
-	return path_world
+
+	return smooth_path(path_world)
+
+func smooth_path(path: Array[Vector3]) -> Array[Vector3]:
+	if path.size() <= 2:
+		return path
+
+	var smoothed: Array[Vector3] = [path[0]]
+	var current_idx = 0
+
+	while current_idx < path.size() - 1:
+		var furthest_visible = current_idx + 1
+		for i in range(current_idx + 2, path.size()):
+			if _has_clear_path(path[current_idx], path[i]):
+				furthest_visible = i
+			else:
+				break
+		smoothed.append(path[furthest_visible])
+		current_idx = furthest_visible
+
+	return smoothed
+
+func _has_clear_path(a: Vector3, b: Vector3) -> bool:
+	var space_state = get_world_3d().direct_space_state
+	# Cast ray slightly above ground
+	var start = a + Vector3(0, 0.5, 0)
+	var end = b + Vector3(0, 0.5, 0)
+
+	# We use a sphere cast (via multiple rays or shape cast) to account for unit width
+	# For simplicity, we use 3 rays (center, left, right)
+	var dir = (end - start).normalized()
+	var side = Vector3(-dir.z, 0, dir.x) * 0.4
+
+	for offset in [Vector3.ZERO, side, -side]:
+		var query = PhysicsRayQueryParameters3D.create(start + offset, end + offset)
+		var result = space_state.intersect_ray(query)
+		if not result.is_empty():
+			return false
+	return true
