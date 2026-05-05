@@ -49,15 +49,15 @@ func _physics_process(delta):
 func _handle_soft_push(delta):
 	var bodies = push_area.get_overlapping_bodies()
 	for body in bodies:
-		if body != self and body.is_in_group("units"):
+		if body != self and body.is_in_group("units") and body.team == team:
 			var push_dir = (body.global_position - global_position)
 			push_dir.y = 0
 			var dist = push_dir.length()
 			if dist < 0.1: continue # Avoid division by zero
 
-			# Stronger push when closer
-			var force = (4.0 - dist) / 4.0
-			body.global_position += push_dir.normalized() * force * 5.0 * delta
+			# Forceful push for teammates
+			var force = (4.5 - dist) / 4.0
+			body.global_position += push_dir.normalized() * force * 15.0 * delta
 
 func _handle_car_movement(delta):
 	if path.is_empty():
