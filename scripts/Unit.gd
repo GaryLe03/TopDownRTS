@@ -3,6 +3,7 @@ extends CharacterBody3D
 @onready var selection_visual = $SelectionVisual
 @onready var shooting_visual = $ShootingVisual
 @onready var attack_timer = $AttackTimer
+@onready var soft_area = $SoftArea
 
 @export var team = 0 # 0 for player, 1 for enemy
 @export var health = 100.0
@@ -28,6 +29,14 @@ func _ready():
 	attack_timer.wait_time = 1.0 / attack_rate
 	shooting_visual.top_level = true
 
+	# Setup collision based on team
+	if team == 0:
+		collision_layer = 2
+		collision_mask = 1 | 4 # Ground/Obstacles | Team 1
+	else:
+		collision_layer = 4
+		collision_mask = 1 | 2 # Ground/Obstacles | Team 0
+
 	# Set color based on team
 	var material = StandardMaterial3D.new()
 	if team == 0:
@@ -45,6 +54,20 @@ func _physics_process(delta):
 
 	_handle_movement(delta)
 	_handle_combat(delta)
+	_handle_soft_collision(delta)
+
+func _handle_soft_collision(delta):
+	var bodies = soft_area.get_overlapping_bodies()
+	for body in bodies:
+		if body != self and body.is_in_group("units") and body.team == team:
+			var push_dir = (global_position - body.global_position).normalized()
+			push_dir.y = 0
+			var dist = global_position.distance_to(body.global_position)
+			if dist < 0.1: continue
+
+			# Nudge away from each other
+			var force = (1.5 - dist) / 1.5
+			global_position += push_dir * force * 2.0 * delta
 
 func _handle_movement(delta):
 	if path.is_empty():

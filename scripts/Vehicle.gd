@@ -28,6 +28,14 @@ func _ready():
 	selection_visual.visible = is_selected
 	global_position.y = 0
 
+	# Setup collision based on team
+	if team == 0:
+		collision_layer = 2
+		collision_mask = 1 | 4 # Ground/Obstacles | Team 1
+	else:
+		collision_layer = 4
+		collision_mask = 1 | 2 # Ground/Obstacles | Team 0
+
 	# Set color based on team
 	var material = StandardMaterial3D.new()
 	if team == 0:
@@ -48,6 +56,7 @@ func _physics_process(delta):
 
 func _handle_soft_push(delta):
 	var bodies = push_area.get_overlapping_bodies()
+	var pushed_count = 0
 	for body in bodies:
 		if body != self and body.is_in_group("units") and body.team == team:
 			var push_dir = (body.global_position - global_position)
@@ -58,6 +67,11 @@ func _handle_soft_push(delta):
 			# Forceful push for teammates
 			var force = (4.5 - dist) / 4.0
 			body.global_position += push_dir.normalized() * force * 15.0 * delta
+			pushed_count += 1
+
+	# Apply resistance (slow down based on number of units being pushed)
+	if pushed_count > 0:
+		current_speed = move_toward(current_speed, max_speed * 0.4, acceleration * delta * pushed_count)
 
 func _handle_car_movement(delta):
 	if path.is_empty():
