@@ -136,7 +136,7 @@ func _handle_car_movement(delta):
 func move_to(target_pos: Vector3):
 	var main = get_tree().current_scene
 	if main and main.has_method("get_astar_path"):
-		var new_path = main.get_astar_path(global_position, target_pos, true)
+		var new_path = main.get_astar_path(global_position, target_pos, true, self)
 
 		if new_path.size() > 1:
 			var first_point = new_path[0]

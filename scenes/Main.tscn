@@ -9,6 +9,7 @@
 [ext_resource type="Script" path="res://scripts/EnemyAI.gd" id="7_ai"]
 [ext_resource type="PackedScene" path="res://scenes/Vehicle.tscn" id="8_veh"]
 [ext_resource type="PackedScene" path="res://scenes/EnemyVehicle.tscn" id="9_eveh"]
+[ext_resource type="PackedScene" path="res://scenes/Building.tscn" id="10_build"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
 sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
@@ -65,6 +66,80 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -8)
 
 [node name="Obstacle4" parent="Obstacles" instance=ExtResource("3_obs")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -5)
+
+[node name="Buildings" type="Node3D" parent="Obstacles"]
+
+[node name="Building1" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -60, 0, -60)
+
+[node name="Building2" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -80, 0, -60)
+
+[node name="Building3" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -100, 0, -60)
+
+[node name="Building4" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -120, 0, -60)
+
+[node name="Building5" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -60, 0, -80)
+
+[node name="Building6" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -80, 0, -80)
+
+[node name="Building7" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -100, 0, -80)
+
+[node name="Building8" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -120, 0, -80)
+
+[node name="Building9" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60, 0, -60)
+
+[node name="Building10" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 80, 0, -60)
+
+[node name="Building11" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 100, 0, -60)
+
+[node name="Building12" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 120, 0, -60)
+
+[node name="Building13" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60, 0, -80)
+
+[node name="Building14" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 80, 0, -80)
+
+[node name="Building15" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 100, 0, -80)
+
+[node name="Building16" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 120, 0, -80)
+
+[node name="Building17" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -60, 0, 60)
+
+[node name="Building18" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -80, 0, 60)
+
+[node name="Building19" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -100, 0, 60)
+
+[node name="Building20" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -120, 0, 60)
+
+[node name="Building21" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60, 0, 60)
+
+[node name="Building22" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 80, 0, 60)
+
+[node name="Building23" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 100, 0, 60)
+
+[node name="Building24" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 120, 0, 60)
 
 [node name="CameraController" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 15, 15)

@@ -25,8 +25,16 @@ func setup_grid():
 	for obstacle in obstacle_nodes:
 		var pos = obstacle.global_position
 		var grid_pos = world_to_grid(pos)
-		for x in range(-2, 3):
-			for y in range(-2, 3):
+
+		# Determine radius based on obstacle type (Building is larger)
+		# Obstacle is 2x2 (radius 1). Building is 12x12 (radius 6).
+		# We add 0.5 units padding (1 cell)
+		var cell_radius = 3 # Default for small obstacles (1.5 units)
+		if obstacle.name.begins_with("Building"):
+			cell_radius = 14 # For buildings (7 units)
+
+		for x in range(-cell_radius, cell_radius + 1):
+			for y in range(-cell_radius, cell_radius + 1):
 				var p = grid_pos + Vector2i(x, y)
 				if static_astar.region.has_point(p):
 					static_astar.set_point_solid(p, true)
@@ -82,7 +90,7 @@ func grid_to_world(grid_pos: Vector2i) -> Vector3:
 		grid_pos.y * cell_size + offset.y
 	)
 
-func get_astar_path(start_world: Vector3, end_world: Vector3, is_vehicle: bool = false) -> Array[Vector3]:
+func get_astar_path(start_world: Vector3, end_world: Vector3, is_vehicle: bool = false, requester: Node3D = null) -> Array[Vector3]:
 	var astar = static_astar if is_vehicle else dynamic_astar
 
 	var start_grid = world_to_grid(start_world)
@@ -96,9 +104,9 @@ func get_astar_path(start_world: Vector3, end_world: Vector3, is_vehicle: bool =
 	for p in path_grid:
 		path_world.append(grid_to_world(p))
 
-	return smooth_path(path_world)
+	return smooth_path(path_world, requester)
 
-func smooth_path(path: Array[Vector3]) -> Array[Vector3]:
+func smooth_path(path: Array[Vector3], requester: Node3D = null) -> Array[Vector3]:
 	if path.size() <= 2:
 		return path
 
@@ -108,7 +116,7 @@ func smooth_path(path: Array[Vector3]) -> Array[Vector3]:
 	while current_idx < path.size() - 1:
 		var furthest_visible = current_idx + 1
 		for i in range(current_idx + 2, path.size()):
-			if _has_clear_path(path[current_idx], path[i]):
+			if _has_clear_path(path[current_idx], path[i], requester):
 				furthest_visible = i
 			else:
 				break
@@ -117,7 +125,7 @@ func smooth_path(path: Array[Vector3]) -> Array[Vector3]:
 
 	return smoothed
 
-func _has_clear_path(a: Vector3, b: Vector3) -> bool:
+func _has_clear_path(a: Vector3, b: Vector3, requester: Node3D = null) -> bool:
 	var space_state = get_world_3d().direct_space_state
 	# Cast ray slightly above ground
 	var start = a + Vector3(0, 0.5, 0)
@@ -130,6 +138,8 @@ func _has_clear_path(a: Vector3, b: Vector3) -> bool:
 
 	for offset in [Vector3.ZERO, side, -side]:
 		var query = PhysicsRayQueryParameters3D.create(start + offset, end + offset)
+		if requester:
+			query.exclude = [requester]
 		var result = space_state.intersect_ray(query)
 		if not result.is_empty():
 			return false
