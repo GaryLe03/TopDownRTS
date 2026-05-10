@@ -64,14 +64,18 @@ func _handle_soft_push(delta):
 			var dist = push_dir.length()
 			if dist < 0.1: continue # Avoid division by zero
 
-			# Forceful push for teammates
-			var force = (4.5 - dist) / 4.0
-			body.global_position += push_dir.normalized() * force * 15.0 * delta
-			pushed_count += 1
+			# Forceful push for teammates (range matches new PushArea radius 3.2)
+			var force = (3.5 - dist) / 3.0
+			if force > 0:
+				body.global_position += push_dir.normalized() * force * 15.0 * delta
+				pushed_count += 1
 
-	# Apply resistance (slow down based on number of units being pushed)
-	if pushed_count > 0:
-		current_speed = move_toward(current_speed, max_speed * 0.4, acceleration * delta * pushed_count)
+	# Apply resistance ONLY if we are already moving
+	if pushed_count > 0 and current_speed > 0.1:
+		var target_res_speed = max_speed * 0.4
+		# Only decrease speed, never increase from zero
+		if current_speed > target_res_speed:
+			current_speed = move_toward(current_speed, target_res_speed, acceleration * delta * pushed_count)
 
 func _handle_car_movement(delta):
 	if path.is_empty():
@@ -102,12 +106,15 @@ func _handle_car_movement(delta):
 	var forward = -transform.basis.z
 	var angle_to_target = forward.signed_angle_to(target_dir, Vector3.UP)
 
-	# Simple steering logic
-	steering = move_toward(steering, clamp(angle_to_target, -1.0, 1.0), steer_speed * delta)
+	# Steering logic: use more responsive steering for smaller angles
+	var target_steering = clamp(angle_to_target * 2.0, -1.0, 1.0)
+	steering = move_toward(steering, target_steering, steer_speed * delta)
 
 	# Acceleration logic
-	# Slow down for sharp turns
-	var throttle = 1.0 - (abs(steering) * 0.5)
+	# Slow down for sharp turns, but allow more speed for minor adjustments
+	var throttle = 1.0 - (abs(steering) * 0.7)
+	if abs(angle_to_target) < 0.2: # Nearly facing target
+		throttle = 1.0
 
 	# Braking logic: Slow down as we approach the final destination
 	if is_final_point:
