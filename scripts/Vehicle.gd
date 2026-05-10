@@ -29,12 +29,13 @@ func _ready():
 	global_position.y = 0
 
 	# Setup collision based on team
+	# Layer 1: Env, 2: Player, 3: Enemy, 4: Vehicles (Layer 8)
 	if team == 0:
-		collision_layer = 2
-		collision_mask = 1 | 4 # Ground/Obstacles | Team 1
+		collision_layer = 8
+		collision_mask = 1 | 4 | 8 # Env | Enemy Team | All Vehicles
 	else:
-		collision_layer = 4
-		collision_mask = 1 | 2 # Ground/Obstacles | Team 0
+		collision_layer = 8
+		collision_mask = 1 | 2 | 8 # Env | Player Team | All Vehicles
 
 	# Set color based on team
 	var material = StandardMaterial3D.new()
@@ -58,17 +59,19 @@ func _handle_soft_push(delta):
 	var bodies = push_area.get_overlapping_bodies()
 	var pushed_count = 0
 	for body in bodies:
-		if body != self and body.is_in_group("units") and body.team == team:
+		if body != self and body.is_in_group("units"):
 			var push_dir = (body.global_position - global_position)
 			push_dir.y = 0
 			var dist = push_dir.length()
-			if dist < 0.1: continue # Avoid division by zero
+			if dist < 0.1: continue
 
-			# Forceful push for teammates (range matches new PushArea radius 3.2)
+			# Forceful push (especially for teammates who don't have hard collision)
 			var force = (3.5 - dist) / 3.0
 			if force > 0:
-				body.global_position += push_dir.normalized() * force * 15.0 * delta
-				pushed_count += 1
+				var multiplier = 20.0 if body.team == team else 5.0
+				body.global_position += push_dir.normalized() * force * multiplier * delta
+				if body.team == team:
+					pushed_count += 1
 
 	# Apply resistance ONLY if we are already moving
 	if pushed_count > 0 and current_speed > 0.1:
@@ -133,7 +136,7 @@ func _handle_car_movement(delta):
 func move_to(target_pos: Vector3):
 	var main = get_tree().current_scene
 	if main and main.has_method("get_astar_path"):
-		var new_path = main.get_astar_path(global_position, target_pos)
+		var new_path = main.get_astar_path(global_position, target_pos, true)
 
 		if new_path.size() > 1:
 			var first_point = new_path[0]

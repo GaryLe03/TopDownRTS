@@ -18,7 +18,7 @@ height = 0.1
 
 [node name="CapturePoint" type="Area3D" groups=["objectives"]]
 collision_layer = 0
-collision_mask = 6 # Team 0 (2) + Team 1 (4)
+collision_mask = 14 # Layer 2 (P.Inf), 4 (E.Inf), 8 (Vehicles)
 script = ExtResource("1_capt")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]

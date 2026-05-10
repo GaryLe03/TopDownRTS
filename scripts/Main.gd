@@ -1,6 +1,7 @@
 extends Node3D
 
-var astar = AStarGrid2D.new()
+var static_astar = AStarGrid2D.new()
+var dynamic_astar = AStarGrid2D.new()
 var grid_size = Vector2i(800, 800)
 var cell_size = 0.5
 var offset = Vector2(-200, -200)
@@ -11,36 +12,62 @@ func _ready():
 	setup_grid()
 
 func setup_grid():
-	astar.region = Rect2i(0, 0, grid_size.x, grid_size.y)
-	astar.cell_size = Vector2(cell_size, cell_size)
-	astar.default_compute_heuristic = AStarGrid2D.HEURISTIC_EUCLIDEAN
-	astar.default_estimate_heuristic = AStarGrid2D.HEURISTIC_EUCLIDEAN
-	astar.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_AT_LEAST_ONE_WALKABLE
-	astar.update()
+	for astar in [static_astar, dynamic_astar]:
+		astar.region = Rect2i(0, 0, grid_size.x, grid_size.y)
+		astar.cell_size = Vector2(cell_size, cell_size)
+		astar.default_compute_heuristic = AStarGrid2D.HEURISTIC_EUCLIDEAN
+		astar.default_estimate_heuristic = AStarGrid2D.HEURISTIC_EUCLIDEAN
+		astar.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_AT_LEAST_ONE_WALKABLE
+		astar.update()
 
-	# Mark obstacles as solid
-	# We check the 'obstacles' group and children of the 'Obstacles' node for redundancy
+	# Mark static obstacles as solid in both grids
 	var obstacle_nodes = get_tree().get_nodes_in_group("obstacles")
-	var obstacles_container = find_child("Obstacles", true, false)
-	if obstacles_container:
-		for child in obstacles_container.get_children():
-			if not obstacle_nodes.has(child):
-				obstacle_nodes.append(child)
-
 	for obstacle in obstacle_nodes:
 		var pos = obstacle.global_position
 		var grid_pos = world_to_grid(pos)
-
-		# Obstacles are 2x2x2. Cell size is 0.5, so 4x4 cells.
-		# We mark a slightly larger area to prevent units (radius 0.4) from clipping.
-		# Mark 5x5 cells (radius 1.25 units) to ensure clearance.
 		for x in range(-2, 3):
 			for y in range(-2, 3):
 				var p = grid_pos + Vector2i(x, y)
-				if astar.region.has_point(p):
-					astar.set_point_solid(p, true)
+				if static_astar.region.has_point(p):
+					static_astar.set_point_solid(p, true)
+					dynamic_astar.set_point_solid(p, true)
 
-	astar.update()
+	static_astar.update()
+	dynamic_astar.update()
+
+var update_tick = 0.0
+
+func _process(delta):
+	update_tick += delta
+	if update_tick >= 0.1:
+		update_tick = 0.0
+		_update_dynamic_grid()
+
+var last_veh_positions = []
+
+func _update_dynamic_grid():
+	# Instead of full reset, we only clear previous vehicle spots
+	for p in last_veh_positions:
+		if dynamic_astar.region.has_point(p):
+			dynamic_astar.set_point_solid(p, static_astar.is_point_solid(p))
+
+	last_veh_positions.clear()
+
+	# Mark vehicles as solid in dynamic grid
+	for veh in get_tree().get_nodes_in_group("units"):
+		if "capacity" in veh and is_instance_valid(veh): # Simple way to identify vehicle
+			var pos = veh.global_position
+			var grid_pos = world_to_grid(pos)
+			# Vehicle is 3x6. Mark 7x13 area for clearance
+			for x in range(-3, 4):
+				for y in range(-6, 7):
+					# Handle rotation - this is a simple approximation
+					var p = grid_pos + Vector2i(x, y)
+					if dynamic_astar.region.has_point(p):
+						dynamic_astar.set_point_solid(p, true)
+						last_veh_positions.append(p)
+
+	dynamic_astar.update()
 
 func world_to_grid(world_pos: Vector3) -> Vector2i:
 	return Vector2i(
@@ -55,7 +82,9 @@ func grid_to_world(grid_pos: Vector2i) -> Vector3:
 		grid_pos.y * cell_size + offset.y
 	)
 
-func get_astar_path(start_world: Vector3, end_world: Vector3) -> Array[Vector3]:
+func get_astar_path(start_world: Vector3, end_world: Vector3, is_vehicle: bool = false) -> Array[Vector3]:
+	var astar = static_astar if is_vehicle else dynamic_astar
+
 	var start_grid = world_to_grid(start_world)
 	var end_grid = world_to_grid(end_world)
 

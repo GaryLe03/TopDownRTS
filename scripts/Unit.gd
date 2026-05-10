@@ -30,12 +30,13 @@ func _ready():
 	shooting_visual.top_level = true
 
 	# Setup collision based on team
+	# Layer 1: Env, 2: Player, 3: Enemy, 4: Vehicles
 	if team == 0:
 		collision_layer = 2
-		collision_mask = 1 | 4 # Ground/Obstacles | Team 1
+		collision_mask = 1 | 4 | 8 # Env | Enemy | Vehicles
 	else:
 		collision_layer = 4
-		collision_mask = 1 | 2 # Ground/Obstacles | Team 0
+		collision_mask = 1 | 2 | 8 # Env | Player | Vehicles
 
 	# Set color based on team
 	var material = StandardMaterial3D.new()
@@ -154,7 +155,7 @@ func take_damage(amount):
 func move_to(target_pos: Vector3):
 	var main = get_tree().current_scene
 	if main and main.has_method("get_astar_path"):
-		var new_path = main.get_astar_path(global_position, target_pos)
+		var new_path = main.get_astar_path(global_position, target_pos, false)
 
 		if new_path.size() > 1:
 			var first_point = new_path[0]
