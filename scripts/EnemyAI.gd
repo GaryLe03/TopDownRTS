@@ -20,15 +20,15 @@ func _think():
 		else:
 			players.append(node)
 
-	var main = get_tree().current_scene
-	var capt = main.find_child("CapturePoint", true, false)
+	var objectives = get_tree().get_nodes_in_group("objectives")
+	var capt = objectives[0] if not objectives.is_empty() else null
 
 	if enemies.is_empty():
 		return
 
 	# AI Logic
 	# 1. If hill is not fully captured by us, move there
-	if capt and capt.capture_progress > -100.0:
+	if capt and "capture_progress" in capt and capt.capture_progress > -100.0:
 		_move_group(enemies, Vector3.ZERO)
 	# 2. If hill is captured, seek and destroy players
 	elif not players.is_empty():

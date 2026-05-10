@@ -16,7 +16,7 @@ top_radius = 10.0
 bottom_radius = 10.0
 height = 0.1
 
-[node name="CapturePoint" type="Area3D"]
+[node name="CapturePoint" type="Area3D" groups=["objectives"]]
 collision_layer = 0
 collision_mask = 6 # Team 0 (2) + Team 1 (4)
 script = ExtResource("1_capt")

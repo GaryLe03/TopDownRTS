@@ -5,9 +5,11 @@ extends Area3D
 @export var current_owner = -1 # -1: None, 0: Player, 1: Enemy
 
 @onready var mesh = $MeshInstance3D
-@onready var progress_ui = get_tree().current_scene.find_child("CaptureUI", true, false)
+var progress_ui = null
 
 func _ready():
+	# Use deferred find to ensure UI is ready
+	call_deferred("_setup_ui")
 	body_entered.connect(_on_body_entered)
 	body_exited.connect(_on_body_exited)
 
@@ -29,6 +31,9 @@ func _process(delta):
 		capture_progress = move_toward(capture_progress, -100.0, delta * capture_speed * min(enemy_count, 3))
 
 	_update_visuals()
+
+func _setup_ui():
+	progress_ui = get_tree().current_scene.find_child("CaptureUI", true, false)
 
 func _update_visuals():
 	var mat = mesh.get_active_material(0)
