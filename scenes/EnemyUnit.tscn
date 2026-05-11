@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/Unit.tscn" id="1_unit"]
+
+[node name="EnemyUnit" instance=ExtResource("1_unit")]
+team = 1

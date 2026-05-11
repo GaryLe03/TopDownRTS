@@ -1,7 +1,15 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://scripts/CameraController.gd" id="1_cam"]
 [ext_resource type="PackedScene" path="res://scenes/Unit.tscn" id="2_unit"]
+[ext_resource type="PackedScene" path="res://scenes/Obstacle.tscn" id="3_obs"]
+[ext_resource type="Script" path="res://scripts/Main.gd" id="4_main"]
+[ext_resource type="PackedScene" path="res://scenes/EnemyUnit.tscn" id="5_enemy"]
+[ext_resource type="PackedScene" path="res://scenes/CapturePoint.tscn" id="6_capt"]
+[ext_resource type="Script" path="res://scripts/EnemyAI.gd" id="7_ai"]
+[ext_resource type="PackedScene" path="res://scenes/Vehicle.tscn" id="8_veh"]
+[ext_resource type="PackedScene" path="res://scenes/EnemyVehicle.tscn" id="9_eveh"]
+[ext_resource type="PackedScene" path="res://scenes/Building.tscn" id="10_build"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
 sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
@@ -17,12 +25,16 @@ tonemap_mode = 2
 glow_enabled = true
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_1"]
-size = Vector2(100, 100)
+size = Vector2(400, 400)
 
 [sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_1"]
-data = PackedVector3Array(50, 0, 50, -50, 0, 50, 50, 0, -50, -50, 0, 50, -50, 0, -50, 50, 0, -50)
+data = PackedVector3Array(200, 0, 200, -200, 0, 200, 200, 0, -200, -200, 0, 200, -200, 0, -200, 200, 0, -200)
 
 [node name="Main" type="Node3D"]
+script = ExtResource("4_main")
+
+[node name="EnemyAI" type="Node" parent="."]
+script = ExtResource("7_ai")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_1")
@@ -39,6 +51,72 @@ mesh = SubResource("PlaneMesh_1")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
 shape = SubResource("ConcavePolygonShape3D_1")
 
+[node name="CapturePoint" parent="." instance=ExtResource("6_capt")]
+
+[node name="Obstacles" type="Node3D" parent="."]
+
+[node name="Obstacle" parent="Obstacles" instance=ExtResource("3_obs")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, 15)
+
+[node name="Obstacle2" parent="Obstacles" instance=ExtResource("3_obs")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0, 15)
+
+[node name="Obstacle3" parent="Obstacles" instance=ExtResource("3_obs")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -20)
+
+[node name="Obstacle4" parent="Obstacles" instance=ExtResource("3_obs")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0, -15)
+
+[node name="Buildings" type="Node3D" parent="Obstacles"]
+
+[node name="Building1" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -80, 0, -80)
+
+[node name="Building2" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -120, 0, -80)
+
+[node name="Building3" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -80, 0, -120)
+
+[node name="Building4" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -120, 0, -120)
+
+[node name="Building5" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 80, 0, -80)
+
+[node name="Building6" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 120, 0, -80)
+
+[node name="Building7" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 80, 0, -120)
+
+[node name="Building8" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 120, 0, -120)
+
+[node name="Building9" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -80, 0, 80)
+
+[node name="Building10" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -120, 0, 80)
+
+[node name="Building11" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -80, 0, 120)
+
+[node name="Building12" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -120, 0, 120)
+
+[node name="Building13" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 80, 0, 80)
+
+[node name="Building14" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 120, 0, 80)
+
+[node name="Building15" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 80, 0, 120)
+
+[node name="Building16" parent="Obstacles/Buildings" instance=ExtResource("10_build")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 120, 0, 120)
+
 [node name="CameraController" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 15, 15)
 script = ExtResource("1_cam")
@@ -46,13 +124,42 @@ script = ExtResource("1_cam")
 [node name="Units" type="Node3D" parent="."]
 
 [node name="Unit" parent="Units" instance=ExtResource("2_unit")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -150, 0, -5)
 
 [node name="Unit2" parent="Units" instance=ExtResource("2_unit")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -150, 0, 0)
 
 [node name="Unit3" parent="Units" instance=ExtResource("2_unit")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -150, 0, 5)
+
+[node name="Unit4" parent="Units" instance=ExtResource("2_unit")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -155, 0, -2.5)
+
+[node name="Unit5" parent="Units" instance=ExtResource("2_unit")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -155, 0, 2.5)
+
+[node name="Vehicle" parent="Units" instance=ExtResource("8_veh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -165, 0, 0)
+
+[node name="Enemies" type="Node3D" parent="."]
+
+[node name="EnemyUnit" parent="Enemies" instance=ExtResource("5_enemy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 150, 0, -5)
+
+[node name="EnemyUnit2" parent="Enemies" instance=ExtResource("5_enemy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 150, 0, 0)
+
+[node name="EnemyUnit3" parent="Enemies" instance=ExtResource("5_enemy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 150, 0, 5)
+
+[node name="EnemyUnit4" parent="Enemies" instance=ExtResource("5_enemy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 155, 0, -2.5)
+
+[node name="EnemyUnit5" parent="Enemies" instance=ExtResource("5_enemy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 155, 0, 2.5)
+
+[node name="EnemyVehicle" parent="Enemies" instance=ExtResource("9_eveh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 165, 0, 0)
 
 [node name="UI" type="CanvasLayer" parent="."]
 
@@ -72,3 +179,28 @@ offset_bottom = 100.0
 text = "WASD to move camera
 Left Click & Drag to select
 Right Click to move units"
+
+[node name="CaptureBar" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_top = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+
+[node name="CaptureUI" type="ProgressBar" parent="UI/CaptureBar"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_right = 150.0
+offset_bottom = 27.0
+grow_horizontal = 2
+grow_vertical = 2
+min_value = -100.0
+step = 1.0
+show_percentage = false

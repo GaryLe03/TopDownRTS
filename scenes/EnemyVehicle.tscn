@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/Vehicle.tscn" id="1_veh"]
+
+[node name="EnemyVehicle" instance=ExtResource("1_veh")]
+team = 1

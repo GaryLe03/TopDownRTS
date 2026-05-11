@@ -1,7 +1,9 @@
 extends Camera3D
 
-@export var move_speed := 20.0
-@export var zoom_speed := 2.0
+@export var base_move_speed := 20.0
+@export var zoom_speed := 5.0
+@export var min_zoom := 5.0
+@export var max_zoom := 100.0
 
 var selection_start = Vector2.ZERO
 var is_dragging = false
@@ -23,11 +25,23 @@ func _handle_movement(delta):
 	if Input.is_action_pressed("ui_right") or Input.is_key_pressed(KEY_D):
 		input_dir.x += 1
 
-	var move_vec = input_dir.normalized() * move_speed * delta
+	# Scale move speed based on current height (y)
+	var current_move_speed = base_move_speed * (global_position.y / 10.0)
+	var move_vec = input_dir.normalized() * current_move_speed * delta
 	global_position += move_vec
 
 func _unhandled_input(event):
 	if event is InputEventMouseButton:
+		var potential_pos = global_position
+		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+			potential_pos -= global_transform.basis.z * zoom_speed
+		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			potential_pos += global_transform.basis.z * zoom_speed
+
+		# Only apply zoom if it keeps the camera within Y bounds
+		if potential_pos.y >= min_zoom and potential_pos.y <= max_zoom:
+			global_position = potential_pos
+
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			if event.pressed:
 				selection_start = event.position
@@ -58,6 +72,10 @@ func _select_units_in_box(start, end):
 
 	var units = get_tree().get_nodes_in_group("units")
 	for unit in units:
+		if unit.team != 0:
+			unit.is_selected = false
+			continue
+
 		var screen_pos = unproject_position(unit.global_position)
 		if is_single_click:
 			# For single click, we might want raycasting instead,
@@ -69,13 +87,14 @@ func _select_units_in_box(start, end):
 
 func _move_selected_units(mouse_pos):
 	var from = project_ray_origin(mouse_pos)
-	var to = from + project_ray_normal(mouse_pos) * 1000
-	var space_state = get_world_3d().direct_space_state
-	var query = PhysicsRayQueryParameters3D.create(from, to)
-	var result = space_state.intersect_ray(query)
+	var dir = project_ray_normal(mouse_pos)
 
-	if not result.is_empty():
-		var target_pos = result.position
+	# Project onto ground plane (y=0)
+	var ground_plane = Plane(Vector3.UP, 0)
+	var intersection = ground_plane.intersects_ray(from, dir)
+
+	if intersection != null:
+		var target_pos = intersection
 		var selected_units = []
 		for unit in get_tree().get_nodes_in_group("units"):
 			if unit.is_selected:
@@ -86,8 +105,9 @@ func _move_selected_units(mouse_pos):
 		if count == 0: return
 
 		var side = ceil(sqrt(count))
+		var offset_start = (side - 1) * 1.5 / 2.0
 		for i in range(count):
 			var x = i % int(side)
 			var z = i / int(side)
-			var offset = Vector3(x * 1.5, 0, z * 1.5)
+			var offset = Vector3(x * 1.5 - offset_start, 0, z * 1.5 - offset_start)
 			selected_units[i].move_to(target_pos + offset)
