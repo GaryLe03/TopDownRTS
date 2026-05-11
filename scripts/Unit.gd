@@ -21,6 +21,7 @@ var path: Array[Vector3] = []
 var speed = 5.0
 var stuck_timer = 0.0
 var last_pos = Vector3.ZERO
+var last_dist_to_target = 10000.0
 var target_unit: CharacterBody3D = null
 
 func _ready():
@@ -74,30 +75,35 @@ func _handle_movement(delta):
 	if path.is_empty():
 		velocity = Vector3.ZERO
 		stuck_timer = 0.0
+		last_dist_to_target = 10000.0
 		return
 
 	var target = path[0]
-	var dir = (target - global_position)
-	dir.y = 0
+	var to_target = (target - global_position)
+	to_target.y = 0
+	var dist = to_target.length()
 
-	# Stuck detection
-	if global_position.distance_to(last_pos) < 0.01:
+	# Stuck detection: Check if we are making progress or stationary
+	if global_position.distance_to(last_pos) < 0.01 or dist >= last_dist_to_target - 0.01:
 		stuck_timer += delta
 	else:
 		stuck_timer = 0.0
-	last_pos = global_position
 
-	if dir.length() < 0.3 or stuck_timer > 1.0:
+	last_pos = global_position
+	last_dist_to_target = dist
+
+	if dist < 0.3 or stuck_timer > 1.0:
 		path.remove_at(0)
 		stuck_timer = 0.0
+		last_dist_to_target = 10000.0
 		if path.is_empty():
 			velocity = Vector3.ZERO
 			return
 		target = path[0]
-		dir = (target - global_position)
-		dir.y = 0
+		to_target = (target - global_position)
+		to_target.y = 0
 
-	velocity = dir.normalized() * speed
+	velocity = to_target.normalized() * speed
 	move_and_slide()
 
 func _handle_combat(delta):

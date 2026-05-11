@@ -23,6 +23,9 @@ var is_selected = false:
 var path: Array[Vector3] = []
 var current_speed = 0.0
 var steering = 0.0
+var stuck_timer = 0.0
+var last_pos = Vector3.ZERO
+var last_dist_to_target = 10000.0
 
 func _ready():
 	selection_visual.visible = is_selected
@@ -85,18 +88,33 @@ func _handle_car_movement(delta):
 		current_speed = move_toward(current_speed, 0, friction * delta * 2.0)
 		velocity = -transform.basis.z * current_speed
 		move_and_slide()
+		stuck_timer = 0.0
+		last_dist_to_target = 10000.0
 		return
 
 	var target = path[0]
 	var to_target = (target - global_position)
 	to_target.y = 0
+	var dist = to_target.length()
+
+	# Stuck detection: Check if we are making progress or stationary
+	# Vehicles need more leniency for turns
+	if global_position.distance_to(last_pos) < 0.01 or (dist >= last_dist_to_target - 0.005 and current_speed < 1.0):
+		stuck_timer += delta
+	else:
+		stuck_timer = 0.0
+
+	last_pos = global_position
+	last_dist_to_target = dist
 
 	# Detect if we are approaching the final point
 	var is_final_point = path.size() == 1
 	var stop_dist = 2.0 if is_final_point else 1.0
 
-	if to_target.length() < stop_dist:
+	if dist < stop_dist or stuck_timer > 2.0:
 		path.remove_at(0)
+		stuck_timer = 0.0
+		last_dist_to_target = 10000.0
 		if path.is_empty():
 			return
 		target = path[0]
