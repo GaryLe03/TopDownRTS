@@ -40,6 +40,13 @@ func setup_grid():
 	astar.update()
 
 	_setup_unit_ui()
+	_setup_ai_pause()
+
+func _setup_ai_pause():
+	var btn = find_child("PauseAIButton")
+	var ai = find_child("EnemyAI")
+	if btn and ai:
+		btn.toggled.connect(func(toggled): ai.is_paused = toggled)
 
 func _setup_unit_ui():
 	var unit_list = find_child("UnitList")

@@ -2,8 +2,11 @@ extends Node
 
 @export var update_interval = 2.0
 var update_timer = 0.0
+var is_paused = false
 
 func _process(delta):
+	if is_paused: return
+
 	update_timer += delta
 	if update_timer >= update_interval:
 		update_timer = 0.0
