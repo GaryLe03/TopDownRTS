@@ -5,7 +5,11 @@ extends CharacterBody3D
 
 @export var team = 0 # 0 for player, 1 for enemy
 @export var health = 200.0
+@export var max_health = 200.0
 @export var capacity = 4
+
+signal health_changed(current, max_h)
+signal selection_changed(selected)
 
 # Car-like movement properties
 @export var max_speed = 10.0
@@ -19,6 +23,7 @@ var is_selected = false:
 		is_selected = value
 		if selection_visual:
 			selection_visual.visible = value
+		selection_changed.emit(value)
 
 var path: Array[Vector3] = []
 var current_speed = 0.0
@@ -29,6 +34,7 @@ var last_dist_to_target = 10000.0
 
 func _ready():
 	selection_visual.visible = is_selected
+	health_changed.emit(health, max_health)
 	global_position.y = 0
 
 	# Setup collision based on team
@@ -167,3 +173,4 @@ func move_to(target_pos: Vector3):
 
 func take_damage(amount):
 	health -= amount
+	health_changed.emit(health, max_health)

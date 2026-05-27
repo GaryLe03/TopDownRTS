@@ -39,6 +39,21 @@ func setup_grid():
 
 	astar.update()
 
+	_setup_unit_ui()
+
+func _setup_unit_ui():
+	var unit_list = find_child("UnitList")
+	if not unit_list: return
+
+	var unit_icon_scene = load("res://scenes/UnitIcon.tscn")
+	var units = get_tree().get_nodes_in_group("units")
+
+	for unit in units:
+		if unit.team == 0: # Player unit
+			var icon = unit_icon_scene.instantiate()
+			unit_list.add_child(icon)
+			icon.setup(unit)
+
 func world_to_grid(world_pos: Vector3) -> Vector2i:
 	return Vector2i(
 		round((world_pos.x - offset.x) / cell_size),

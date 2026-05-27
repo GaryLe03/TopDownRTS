@@ -7,15 +7,20 @@ extends CharacterBody3D
 
 @export var team = 0 # 0 for player, 1 for enemy
 @export var health = 100.0
+@export var max_health = 100.0
 @export var attack_range = 10.0
 @export var attack_damage = 10.0
 @export var attack_rate = 1.0
+
+signal health_changed(current, max_h)
+signal selection_changed(selected)
 
 var is_selected = false:
 	set(value):
 		is_selected = value
 		if selection_visual:
 			selection_visual.visible = value
+		selection_changed.emit(value)
 
 var path: Array[Vector3] = []
 var speed = 5.0
@@ -26,6 +31,7 @@ var target_unit: CharacterBody3D = null
 
 func _ready():
 	selection_visual.visible = is_selected
+	health_changed.emit(health, max_health)
 	global_position.y = 0
 	attack_timer.wait_time = 1.0 / attack_rate
 	shooting_visual.top_level = true
@@ -157,6 +163,7 @@ func _shoot(target):
 
 func take_damage(amount):
 	health -= amount
+	health_changed.emit(health, max_health)
 
 func move_to(target_pos: Vector3):
 	var main = get_tree().current_scene
