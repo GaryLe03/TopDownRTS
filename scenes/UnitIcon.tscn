@@ -1,0 +1,26 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/UnitIcon.gd" id="1_icon"]
+[ext_resource type="Texture2D" path="res://icon.svg" id="2_svg"]
+
+[node name="UnitIcon" type="PanelContainer"]
+custom_minimum_size = Vector2(64, 80)
+offset_right = 64.0
+offset_bottom = 80.0
+script = ExtResource("1_icon")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Icon" type="TextureRect" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+texture = ExtResource("2_svg")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="HealthBar" type="ProgressBar" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+value = 100.0
+show_percentage = false
