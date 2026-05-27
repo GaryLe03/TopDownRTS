@@ -139,7 +139,7 @@ func _handle_car_movement(delta):
 
 	# Braking logic: Slow down as we approach the final destination
 	if is_final_point:
-		var dist = to_target.length()
+		dist = to_target.length()
 		if dist < 10.0:
 			throttle *= (dist / 10.0)
 
